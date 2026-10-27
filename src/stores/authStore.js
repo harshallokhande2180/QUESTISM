@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 export const useAuthStore = create((set, get) => ({
   user: null,
   session: null,
-  loading: true,   // start true so App shows spinner while session is restored
+  loading: true, // start true so App shows spinner while session is restored
   error: null,
 
   initialize: async () => {
@@ -34,14 +34,35 @@ export const useAuthStore = create((set, get) => ({
   signUp: async (email, password) => {
     set({ loading: true, error: null })
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password })
+      const cleanEmail = (email || '').trim().toLowerCase()
+      const { data, error } = await supabase.auth.signUp({ email: cleanEmail, password })
       if (error) throw error
-      set({
-        user: data.user,
-        session: data.session,
-        loading: false,
-      })
-      return { data, needsVerification: !data.session }
+
+      // If Supabase issued a session immediately, user is logged in
+      if (data?.session) {
+        set({
+          user: data.user,
+          session: data.session,
+          loading: false,
+        })
+        return { data, needsVerification: false }
+      }
+
+      // If no session was returned, attempt immediate sign-in with password
+      try {
+        const signInRes = await supabase.auth.signInWithPassword({ email: cleanEmail, password })
+        if (!signInRes.error && signInRes.data?.session) {
+          set({
+            user: signInRes.data.user,
+            session: signInRes.data.session,
+            loading: false,
+          })
+          return { data: signInRes.data, needsVerification: false }
+        }
+      } catch {}
+
+      set({ loading: false })
+      return { data, needsVerification: true }
     } catch (error) {
       set({ error: error.message, loading: false })
       return { error }
@@ -51,11 +72,17 @@ export const useAuthStore = create((set, get) => ({
   signIn: async (email, password) => {
     set({ loading: true, error: null })
     try {
+      const cleanEmail = (email || '').trim().toLowerCase()
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: cleanEmail,
         password,
       })
-      if (error) throw error
+      if (error) {
+        if (error.message?.toLowerCase().includes('email not confirmed')) {
+          throw new Error('Email not confirmed. Please toggle OFF "Confirm email" in Supabase Authentication settings.')
+        }
+        throw error
+      }
       set({
         user: data.user,
         session: data.session,
@@ -82,7 +109,8 @@ export const useAuthStore = create((set, get) => ({
   resetPassword: async (email) => {
     set({ loading: true, error: null })
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const cleanEmail = (email || '').trim().toLowerCase()
+      const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
       })
       if (error) throw error
@@ -96,4 +124,3 @@ export const useAuthStore = create((set, get) => ({
 
   clearError: () => set({ error: null }),
 }))
-

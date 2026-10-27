@@ -646,3 +646,14 @@ a:hover { color: #DDD6FE; }
 
 /* ── BorderTrailCard ── */
 .border-trail-card { position: relative; overflow: hidden; }
+
+/* ── Mobile Touch Optimizations ── */
+@media (hover: none) and (pointer: coarse) {
+  .cursor-wrapper {
+    display: none !important;
+  }
+  input, button, select, textarea {
+    font-size: 16px !important; /* Prevents iOS auto-zoom on input focus */
+  }
+}
+
