@@ -1,17 +1,32 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { localAuth } from '../lib/localAuth'
 
 export const useAuthStore = create((set, get) => ({
   user: null,
   session: null,
-  loading: true, // start true so App shows spinner while session is restored
+  loading: true,
   error: null,
 
   initialize: async () => {
     try {
       set({ loading: true })
-      const { data: { session }, error } = await supabase.auth.getSession()
-      if (error) throw error
+      let session = null
+
+      try {
+        const { data, error } = await supabase.auth.getSession()
+        if (!error && data?.session) {
+          session = data.session
+        }
+      } catch (err) {
+        console.warn('[AUTH] Supabase network unreachable, checking local session:', err.message)
+      }
+
+      // If no cloud session, check local session
+      if (!session) {
+        const localRes = localAuth.auth.getSession()
+        session = localRes.data?.session || null
+      }
 
       set({
         session,
@@ -19,13 +34,17 @@ export const useAuthStore = create((set, get) => ({
         loading: false,
       })
 
-      // Listen for auth state changes (sign in, sign out, token refresh)
-      supabase.auth.onAuthStateChange((_event, session) => {
-        set({
-          session,
-          user: session?.user ?? null,
+      // Listen for cloud auth changes
+      try {
+        supabase.auth.onAuthStateChange((_event, session) => {
+          if (session) {
+            set({
+              session,
+              user: session?.user ?? null,
+            })
+          }
         })
-      })
+      } catch {}
     } catch (error) {
       set({ error: error.message, loading: false })
     }
@@ -33,8 +52,9 @@ export const useAuthStore = create((set, get) => ({
 
   signUp: async (email, password) => {
     set({ loading: true, error: null })
+    const cleanEmail = (email || '').trim().toLowerCase()
+
     try {
-      const cleanEmail = (email || '').trim().toLowerCase()
       const { data, error } = await supabase.auth.signUp({ email: cleanEmail, password })
       if (error) throw error
 
@@ -64,6 +84,26 @@ export const useAuthStore = create((set, get) => ({
       set({ loading: false })
       return { data, needsVerification: true }
     } catch (error) {
+      const isNetworkIssue =
+        error.message?.toLowerCase().includes('failed to fetch') ||
+        error.name === 'TypeError' ||
+        error.message?.toLowerCase().includes('network')
+
+      if (isNetworkIssue) {
+        console.warn('[AUTH] Cloud unreachable (likely ISP DNS filter). Falling back to local auth engine.')
+        const localRes = await localAuth.auth.signUp({ email: cleanEmail, password })
+        if (localRes.error) {
+          set({ error: localRes.error.message, loading: false })
+          return { error: localRes.error }
+        }
+        set({
+          user: localRes.data.user,
+          session: localRes.data.session,
+          loading: false,
+        })
+        return { data: localRes.data, needsVerification: false }
+      }
+
       set({ error: error.message, loading: false })
       return { error }
     }
@@ -71,8 +111,9 @@ export const useAuthStore = create((set, get) => ({
 
   signIn: async (email, password) => {
     set({ loading: true, error: null })
+    const cleanEmail = (email || '').trim().toLowerCase()
+
     try {
-      const cleanEmail = (email || '').trim().toLowerCase()
       const { data, error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
         password,
@@ -90,6 +131,26 @@ export const useAuthStore = create((set, get) => ({
       })
       return { data }
     } catch (error) {
+      const isNetworkIssue =
+        error.message?.toLowerCase().includes('failed to fetch') ||
+        error.name === 'TypeError' ||
+        error.message?.toLowerCase().includes('network')
+
+      if (isNetworkIssue) {
+        console.warn('[AUTH] Cloud unreachable (likely ISP DNS filter). Falling back to local auth engine.')
+        const localRes = await localAuth.auth.signInWithPassword({ email: cleanEmail, password })
+        if (localRes.error) {
+          set({ error: localRes.error.message, loading: false })
+          return { error: localRes.error }
+        }
+        set({
+          user: localRes.data.user,
+          session: localRes.data.session,
+          loading: false,
+        })
+        return { data: localRes.data }
+      }
+
       set({ error: error.message, loading: false })
       return { error }
     }
@@ -98,8 +159,10 @@ export const useAuthStore = create((set, get) => ({
   signOut: async () => {
     set({ loading: true })
     try {
-      const { error } = await supabase.auth.signOut()
-      if (error) throw error
+      try {
+        await supabase.auth.signOut()
+      } catch {}
+      await localAuth.auth.signOut()
       set({ user: null, session: null, loading: false })
     } catch (error) {
       set({ error: error.message, loading: false })
@@ -108,8 +171,8 @@ export const useAuthStore = create((set, get) => ({
 
   resetPassword: async (email) => {
     set({ loading: true, error: null })
+    const cleanEmail = (email || '').trim().toLowerCase()
     try {
-      const cleanEmail = (email || '').trim().toLowerCase()
       const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
       })
