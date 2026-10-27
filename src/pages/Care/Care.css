@@ -1,0 +1,181 @@
+/* ========================================
+   CARE PAGE — Skin Care & Stretches
+   ======================================== */
+
+.care-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.care-header__title {
+  font-size: 1.375rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.care-header__subtitle {
+  font-size: 0.8125rem;
+  color: #64748B;
+}
+
+/* ── Care Section ── */
+.care-section {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all var(--transition-smooth);
+}
+
+.care-section--complete {
+  border-color: rgba(34, 197, 94, 0.2);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.04);
+}
+
+.care-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.care-section__header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.care-section__items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Care Item (Checkbox-style) ── */
+.care-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(11, 18, 32, 0.4);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+  color: #E2E8F0;
+}
+
+.care-item:hover {
+  background: rgba(168, 85, 247, 0.04);
+  border-color: var(--border-glow);
+}
+
+.care-item--done {
+  background: rgba(34, 197, 94, 0.04);
+  border-color: rgba(34, 197, 94, 0.12);
+}
+
+.care-item--done .care-item__label {
+  text-decoration: line-through;
+  color: #64748B;
+}
+
+.care-item__icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.care-item__label {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+.care-item__check {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border-glow-strong);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: transparent;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  background: var(--surface-dark);
+}
+
+.care-item__check--done {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.1));
+  border-color: var(--system-green);
+  color: var(--system-green);
+}
+
+/* ── Stretch Timer Items ── */
+.care-stretch {
+  display: flex;
+  flex-direction: column;
+}
+
+.care-stretch--done .care-stretch__btn {
+  background: rgba(34, 197, 94, 0.04);
+  border-color: rgba(34, 197, 94, 0.12);
+}
+
+.care-stretch__btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(11, 18, 32, 0.4);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+  color: #E2E8F0;
+}
+
+.care-stretch__btn:hover {
+  background: rgba(168, 85, 247, 0.04);
+  border-color: var(--border-glow);
+}
+
+.care-stretch__btn--active {
+  background: rgba(168, 85, 247, 0.06);
+  border-color: rgba(168, 85, 247, 0.25);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.care-stretch__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.care-stretch__timer-info {
+  display: flex;
+  align-items: center;
+}
+
+.care-stretch__countdown {
+  font-family: var(--font-hud);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.care-stretch__duration {
+  font-family: var(--font-hud);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #475569;
+  letter-spacing: 0.05em;
+}

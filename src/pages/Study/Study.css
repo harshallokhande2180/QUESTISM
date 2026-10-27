@@ -1,0 +1,219 @@
+/* ========================================
+   STUDY PAGE — Academic Module
+   ======================================== */
+
+.study-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.study-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.study-header__title {
+  font-size: 1.375rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.study-header__subtitle {
+  font-size: 0.8125rem;
+  color: #64748B;
+}
+
+/* ── Overall Progress ── */
+.study-progress {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.study-progress__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.study-progress__percent {
+  font-family: var(--font-hud);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--monarch-purple);
+}
+
+/* ── Next Topic Recommendation ── */
+.study-next {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.study-next__topic {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.study-next__icon {
+  font-size: 1.5rem;
+}
+
+.study-next__subject {
+  font-family: var(--font-hud);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #64748B;
+  margin-bottom: 2px;
+}
+
+.study-next__name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #F8FAFC;
+}
+
+/* ── Subject Cards ── */
+.study-subjects {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.study-subject {
+  overflow: hidden;
+}
+
+.study-subject--cyan { border-color: rgba(168, 85, 247, 0.15); }
+.study-subject--purple { border-color: rgba(168, 85, 247, 0.15); }
+.study-subject--gold { border-color: rgba(255, 215, 0, 0.15); }
+.study-subject--green { border-color: rgba(34, 197, 94, 0.15); }
+
+.study-subject__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #E2E8F0;
+  text-align: left;
+  font-family: var(--font-body);
+  transition: background var(--transition-fast);
+}
+
+.study-subject__header:hover {
+  background: rgba(168, 85, 247, 0.03);
+}
+
+.study-subject__header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.study-subject__icon {
+  font-size: 1.5rem;
+}
+
+.study-subject__name {
+  font-size: 0.875rem;
+  margin-bottom: 3px;
+}
+
+.study-subject__count {
+  font-size: 0.6875rem;
+  color: #64748B;
+}
+
+.study-subject__header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.study-subject__percent {
+  font-family: var(--font-hud);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--monarch-purple);
+}
+
+.study-subject__arrow {
+  color: #64748B;
+  font-size: 0.875rem;
+  transition: transform var(--transition-fast);
+}
+
+.study-subject__arrow--open {
+  transform: rotate(90deg);
+}
+
+/* ── Units ── */
+.study-subject__units {
+  padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.study-unit__name {
+  font-size: 0.75rem;
+  color: #94A3B8;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-glow);
+}
+
+.study-unit__topics {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ── Topic Items ── */
+.study-topic {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+  color: #E2E8F0;
+  transition: all var(--transition-fast);
+}
+
+.study-topic:hover {
+  background: rgba(168, 85, 247, 0.03);
+}
+
+.study-topic--done {
+  background: rgba(34, 197, 94, 0.03);
+}
+
+.study-topic--done .study-topic__name {
+  text-decoration: line-through;
+  color: #64748B;
+}
+
+.study-topic__name {
+  font-size: 0.8125rem;
+  transition: color var(--transition-fast);
+}

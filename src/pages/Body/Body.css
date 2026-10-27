@@ -1,0 +1,638 @@
+/* ========================================
+   BODY PAGE — Workout Tracker
+   ======================================== */
+
+.body-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.body-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.body-header__title {
+  font-size: 1.375rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.body-header__meta {
+  display: flex;
+  gap: 8px;
+}
+
+.body-header__subtitle {
+  font-size: 0.8125rem;
+  color: #64748B;
+}
+
+/* ── Baseline Test ── */
+.body-baseline {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.body-baseline__exercises {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.body-baseline__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.body-baseline__label {
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #CBD5E1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.body-baseline__icon {
+  font-size: 1rem;
+}
+
+.body-baseline__hint {
+  font-size: 0.6875rem;
+  color: #475569;
+}
+
+.body-baseline__submit {
+  align-self: stretch;
+  padding: 14px;
+}
+
+.body-baseline__note {
+  font-family: var(--font-hud);
+  font-size: 0.625rem;
+  color: #475569;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+/* ── Exercise Cards ── */
+.body-exercises {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.body-exercise {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all var(--transition-smooth);
+  position: relative;
+}
+
+.body-exercise--complete {
+  border-color: rgba(34, 197, 94, 0.35);
+  box-shadow: 0 0 25px rgba(34, 197, 94, 0.08);
+}
+
+.body-exercise--locked {
+  background: rgba(14, 5, 32, 0.7);
+  border-color: rgba(168, 85, 247, 0.25);
+}
+
+.body-exercise__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.body-exercise__info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.body-exercise__icon {
+  font-size: 1.5rem;
+}
+
+.body-exercise__name {
+  font-size: 0.875rem;
+  margin-bottom: 2px;
+}
+
+.body-exercise__muscle {
+  font-size: 0.6875rem;
+  color: #64748B;
+}
+
+.body-exercise__badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Target & Lock Header Row ── */
+.body-exercise__target-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.body-exercise__target {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: var(--surface-mid);
+  border-radius: 6px;
+  border: 1px solid var(--border-glow);
+  flex: 1;
+  min-width: 140px;
+}
+
+.body-exercise__target-label {
+  font-family: var(--font-hud);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #64748B;
+}
+
+.body-exercise__target-value {
+  font-family: var(--font-hud);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--monarch-purple);
+}
+
+.body-exercise__lock-btn {
+  font-family: var(--font-hud);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border-glow);
+  background: var(--surface-dark);
+  color: #94A3B8;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.body-exercise__lock-btn:hover {
+  border-color: var(--monarch-purple);
+  color: #EDE9FE;
+  background: rgba(168, 85, 247, 0.12);
+}
+
+.body-exercise__lock-btn--locked {
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #F87171;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.body-exercise__lock-btn--locked:hover {
+  border-color: rgba(239, 68, 68, 0.6);
+  color: #FECACA;
+  background: rgba(239, 68, 68, 0.16);
+}
+
+/* ── Exercise Rep Inputs ── */
+.body-exercise__input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  transition: opacity var(--transition-normal);
+}
+
+.body-exercise__input-row--disabled {
+  opacity: 0.65;
+}
+
+.body-exercise__btn {
+  font-family: var(--font-hud);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-glow);
+  background: var(--surface-dark);
+  color: #94A3B8;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  letter-spacing: 0.05em;
+}
+
+.body-exercise__btn:hover:not(:disabled) {
+  border-color: var(--border-glow-strong);
+  color: var(--monarch-purple);
+  background: rgba(168, 85, 247, 0.05);
+}
+
+.body-exercise__btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.body-exercise__count {
+  width: 90px;
+  text-align: center;
+  font-family: var(--font-hud);
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding: 8px;
+  transition: all var(--transition-fast);
+}
+
+.body-exercise__count--locked {
+  background: rgba(7, 2, 15, 0.95);
+  border-color: rgba(139, 92, 246, 0.2);
+  color: #A78BFA;
+  cursor: not-allowed;
+}
+
+.body-exercise__percent {
+  font-family: var(--font-hud);
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #64748B;
+  text-align: right;
+  letter-spacing: 0.05em;
+}
+
+/* ── Cleared Checkbox Section ── */
+.body-exercise__clear-section {
+  margin-top: 4px;
+  padding: 10px 14px;
+  background: rgba(14, 5, 32, 0.85);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: 8px;
+  transition: all var(--transition-fast);
+}
+
+.body-exercise__clear-section--checked {
+  background: rgba(34, 197, 94, 0.06);
+  border-color: rgba(34, 197, 94, 0.35);
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.06);
+}
+
+.body-exercise__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.body-exercise__checkbox-native {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.body-exercise__checkbox-box {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(148, 163, 184, 0.4);
+  background: var(--surface-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-hud);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: #020006;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.body-exercise__checkbox-label:hover .body-exercise__checkbox-box {
+  border-color: var(--monarch-purple);
+}
+
+.body-exercise__checkbox-box--active {
+  background: #22C55E;
+  border-color: #22C55E;
+  color: #020006;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.45);
+}
+
+.body-exercise__checkbox-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.body-exercise__checkbox-title {
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #E2E8F0;
+  transition: color var(--transition-fast);
+}
+
+.body-exercise__clear-section--checked .body-exercise__checkbox-title {
+  color: #4ADE80;
+}
+
+.body-exercise__checkbox-desc {
+  font-size: 0.6875rem;
+  color: #64748B;
+}
+
+/* ── Running Card & Distance Calculator ── */
+.body-run {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: all var(--transition-smooth);
+}
+
+.body-run--complete {
+  border-color: rgba(34, 197, 94, 0.35);
+  box-shadow: 0 0 25px rgba(34, 197, 94, 0.08);
+}
+
+.body-run__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.body-run__badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Target Distance & GPS HUD ── */
+.body-run__target-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: var(--surface-mid);
+  border: 1px solid var(--border-glow);
+  border-radius: 8px;
+}
+
+.body-run__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.body-run__label {
+  font-family: var(--font-hud);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #94A3B8;
+}
+
+.body-run__target-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.body-run__target-input {
+  width: 100px;
+  font-family: var(--font-hud);
+  font-size: 1.125rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  text-align: center;
+}
+
+.body-run__target-unit {
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--monarch-purple);
+}
+
+.body-run__gps-hud {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.body-run__gps-label {
+  font-family: var(--font-hud);
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #64748B;
+}
+
+.body-run__gps-indicator {
+  font-family: var(--font-hud);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: rgba(7, 2, 15, 0.8);
+  border: 1px solid var(--border-glow);
+  color: #94A3B8;
+}
+
+.body-run__gps-indicator--active {
+  color: #22C55E;
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
+}
+
+.body-run__gps-indicator--simulated {
+  color: #F59E0B;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.body-run__gps-indicator--error {
+  color: #EF4444;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* ── Calculator Dashboard ── */
+.body-calculator {
+  padding: 18px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  background: rgba(7, 2, 15, 0.85);
+}
+
+.body-calculator__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.body-calculator__timer-chip {
+  font-family: var(--font-hud);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #CBD5E1;
+  background: rgba(14, 5, 32, 0.8);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-glow);
+  letter-spacing: 0.08em;
+}
+
+.body-calculator__meter {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.body-calculator__odometer {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.body-calculator__num {
+  font-family: var(--font-hud);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #00E5FF;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(0, 229, 255, 0.35);
+}
+
+.body-calculator__slash {
+  font-family: var(--font-hud);
+  font-size: 1.25rem;
+  color: #475569;
+}
+
+.body-calculator__target-num {
+  font-family: var(--font-hud);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #94A3B8;
+}
+
+.body-calculator__unit {
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748B;
+  letter-spacing: 0.1em;
+}
+
+/* ── Metrics Grid ── */
+.body-calculator__stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .body-calculator__stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.body-calculator__stat-item {
+  padding: 10px 12px;
+  background: var(--surface-mid);
+  border: 1px solid var(--border-glow);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.body-calculator__stat-label {
+  font-family: var(--font-hud);
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #64748B;
+}
+
+.body-calculator__stat-val {
+  font-family: var(--font-hud);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--monarch-purple);
+}
+
+/* ── Calculator Action Buttons ── */
+.body-calculator__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.body-calculator__btn-primary {
+  flex: 1;
+  padding: 12px 18px;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+}
+
+.body-calculator__btn-treadmill {
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+
+.body-calculator__btn-treadmill:hover {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: #F59E0B;
+}
+
+.body-calculator__completed-banner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.body-calculator__btn-reset {
+  align-self: flex-start;
+  font-size: 0.75rem;
+  padding: 6px 12px;
+}

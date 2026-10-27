@@ -1,0 +1,342 @@
+/* ========================================
+   ROUTINE PAGE — Daily Quest Interface
+   ======================================== */
+
+.routine-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Header ── */
+.routine-header {
+  margin-bottom: 4px;
+}
+
+.routine-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.routine-header__title {
+  font-size: 1.375rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.routine-header__subtitle {
+  font-size: 0.8125rem;
+  color: #64748B;
+}
+
+/* ── Progress Overview ── */
+.routine-progress {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all var(--transition-smooth);
+}
+
+.routine-progress--complete {
+  border-color: rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.08);
+}
+
+.routine-progress__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.routine-progress__count {
+  font-family: var(--font-hud);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.routine-progress__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.routine-progress__percent {
+  font-family: var(--font-hud);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #64748B;
+  letter-spacing: 0.05em;
+}
+
+.routine-progress__complete-badge {
+  font-family: var(--font-hud);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--dungeon-gold);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ── Quest Sections ── */
+.routine-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quest-section {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.quest-section--cyan { border-color: rgba(168, 85, 247, 0.15); }
+.quest-section--green { border-color: rgba(34, 197, 94, 0.15); }
+.quest-section--purple { border-color: rgba(168, 85, 247, 0.15); }
+.quest-section--gold { border-color: rgba(255, 215, 0, 0.15); }
+
+.quest-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quest-section__header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quest-section__icon {
+  font-size: 1rem;
+}
+
+.quest-section__counter {
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748B;
+  letter-spacing: 0.05em;
+}
+
+.quest-section__counter--done {
+  color: var(--system-green);
+}
+
+.quest-section__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Quest Item ── */
+.quest-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(11, 18, 32, 0.4);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  width: 100%;
+  font-family: var(--font-body);
+  color: #E2E8F0;
+}
+
+.quest-item:hover {
+  background: rgba(168, 85, 247, 0.04);
+  border-color: var(--border-glow);
+}
+
+.quest-item--completed {
+  background: rgba(34, 197, 94, 0.04);
+  border-color: rgba(34, 197, 94, 0.12);
+}
+
+.quest-item--completed .quest-item__title {
+  text-decoration: line-through;
+  color: #64748B;
+}
+
+.quest-item--animating {
+  animation: questComplete 0.5s ease-out;
+}
+
+@keyframes questComplete {
+  0% { transform: scale(1); }
+  20% { transform: scale(1.02); box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+  100% { transform: scale(1); }
+}
+
+.quest-item__check {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border-glow-strong);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: transparent;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+  background: var(--surface-dark);
+}
+
+.quest-item__check--done {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.1));
+  border-color: var(--system-green);
+  color: var(--system-green);
+}
+
+.quest-item__content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.quest-item__title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quest-item__status {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* ── Add Quest Form ── */
+.routine-add {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.routine-add__form {
+  display: flex;
+  gap: 10px;
+}
+
+.routine-add__form .input-field {
+  flex: 1;
+}
+
+.routine-add__form .btn {
+  flex-shrink: 0;
+}
+
+/* ── Tomorrow Section ── */
+.routine-tomorrow {
+  padding: 0;
+  overflow: hidden;
+}
+
+.routine-tomorrow__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #E2E8F0;
+  transition: background var(--transition-fast);
+}
+
+.routine-tomorrow__toggle:hover {
+  background: rgba(168, 85, 247, 0.03);
+}
+
+.routine-tomorrow__arrow {
+  color: #64748B;
+  font-size: 0.875rem;
+  transition: transform var(--transition-fast);
+}
+
+.routine-tomorrow__arrow--open {
+  transform: rotate(90deg);
+}
+
+.routine-tomorrow__content {
+  padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.routine-tomorrow__note {
+  font-size: 0.75rem;
+  color: #64748B;
+  line-height: 1.5;
+}
+
+.routine-tomorrow__note strong {
+  color: var(--dungeon-gold);
+}
+
+.routine-tomorrow__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.routine-tomorrow__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 215, 0, 0.04);
+  border: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.routine-tomorrow__item-icon {
+  font-size: 0.875rem;
+}
+
+.routine-tomorrow__item-title {
+  flex: 1;
+  font-size: 0.8125rem;
+  color: #E2E8F0;
+}
+
+.routine-tomorrow__remove {
+  background: none;
+  border: none;
+  color: #475569;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: all var(--transition-fast);
+}
+
+.routine-tomorrow__remove:hover {
+  color: var(--system-red);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.routine-tomorrow__empty {
+  padding: 16px;
+  text-align: center;
+  font-size: 0.8125rem;
+}
