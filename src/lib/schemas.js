@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 /** Auth Schemas */
-export const emailSchema = z.string().email('Invalid email address').max(254)
+export const emailSchema = z.string().trim().toLowerCase().email('Invalid email address').max(254)
 export const passwordSchema = z.string().min(8, 'Minimum 8 characters').max(72, 'Maximum 72 characters')
 
 export const signUpSchema = z.object({

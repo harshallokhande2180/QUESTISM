@@ -78,7 +78,7 @@ export const localAuth = {
      */
     async signUp({ email, password }) {
       const users = getUsers()
-      const key = email.toLowerCase()
+      const key = (email || '').trim().toLowerCase()
 
       if (users[key]) {
         return {
@@ -89,7 +89,7 @@ export const localAuth = {
 
       const user = {
         id: crypto.randomUUID(),
-        email,
+        email: key,
         created_at: new Date().toISOString(),
         user_metadata: {},
       }
@@ -110,7 +110,7 @@ export const localAuth = {
      */
     async signInWithPassword({ email, password }) {
       const users = getUsers()
-      const key = email.toLowerCase()
+      const key = (email || '').trim().toLowerCase()
       const record = users[key]
 
       if (!record) {

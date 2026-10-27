@@ -30,11 +30,13 @@ export default function AuthPage() {
       return
     }
 
+    const cleanEmail = email.trim().toLowerCase()
+
     // Validate
     const schema = mode === 'signup' ? signUpSchema : signInSchema
     const payload = mode === 'signup'
-      ? { email, password, confirmPassword }
-      : { email, password }
+      ? { email: cleanEmail, password, confirmPassword }
+      : { email: cleanEmail, password }
 
     const validation = schema.safeParse(payload)
     if (!validation.success) {
@@ -47,7 +49,7 @@ export default function AuthPage() {
     }
 
     if (mode === 'signup') {
-      const result = await signUp(email, password)
+      const result = await signUp(cleanEmail, password)
       if (result.needsVerification) {
         setSuccess('[SYSTEM] Verification email sent. Check your inbox to activate your account.')
         setMode('signin')
@@ -55,7 +57,7 @@ export default function AuthPage() {
         navigate('/routine')
       }
     } else {
-      const result = await signIn(email, password)
+      const result = await signIn(cleanEmail, password)
       if (!result.error) {
         navigate('/routine')
       }
