@@ -145,6 +145,35 @@ export const localAuth = {
       return { data: { user: record.user, session }, error: null }
     },
 
+    async signInWithOAuth({ provider = 'google' } = {}) {
+      const users = getUsers()
+      const googleEmail = 'hunter.gmail@gmail.com'
+      if (!users[googleEmail]) {
+        users[googleEmail] = {
+          user: {
+            id: 'google-hunter-001',
+            email: googleEmail,
+            created_at: new Date().toISOString(),
+            user_metadata: {
+              name: 'Shadow Monarch (Gmail)',
+              full_name: 'Shadow Monarch',
+              avatar_url: 'https://api.dicebear.com/7.x/bottts/svg?seed=ShadowMonarch',
+              provider: provider,
+            },
+          },
+          password: btoa('google-oauth-token'),
+        }
+        saveUsers(users)
+      }
+
+      localStorage.removeItem('questism_signed_out')
+      const session = makeSession(users[googleEmail].user)
+      saveSession(session)
+      notifySubscribers('SIGNED_IN', session)
+
+      return { data: { user: users[googleEmail].user, session }, error: null }
+    },
+
     async signOut() {
       localStorage.setItem('questism_signed_out', 'true')
       saveSession(null)

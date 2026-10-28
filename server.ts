@@ -771,10 +771,16 @@ app.delete('/api/account/purge', (req, res) => {
 // ── Start Server with Vite Middleware in Dev ──────────────────────────────────
 async function startServer() {
   const PORT = Number(process.env.PORT) || 3000
+  const http = await import('http')
+  const httpServer = http.createServer(app)
+
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite')
     const vite = await createViteServer({
-      server: { middlewareMode: true, hmr: false },
+      server: {
+        middlewareMode: true,
+        hmr: { server: httpServer },
+      },
       appType: 'spa',
     })
     app.use(vite.middlewares)
@@ -786,8 +792,8 @@ async function startServer() {
     })
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[QUESTISM] Full-stack server running on http://0.0.0.0:${PORT}`)
+  httpServer.listen(PORT, '0.0.0.0', () => {
+    console.log(`[QUESTISM] Full-stack server running on http://localhost:${PORT}`)
   })
 }
 

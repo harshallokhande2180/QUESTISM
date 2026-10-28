@@ -156,6 +156,46 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  signInWithGoogle: async () => {
+    set({ loading: true, error: null })
+    try {
+      if (typeof supabase?.auth?.signInWithOAuth === 'function') {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/routine`,
+          },
+        })
+        if (error) throw error
+        if (data?.session) {
+          set({
+            user: data.session.user || data.user,
+            session: data.session,
+            loading: false,
+          })
+          return { data }
+        }
+      } else {
+        throw new Error('Supabase OAuth not initialized')
+      }
+      set({ loading: false })
+      return { success: true }
+    } catch (error) {
+      console.warn('[AUTH] Google OAuth cloud redirect unavailable or blocked. Activating local Google authentication:', error.message)
+      const localRes = await localAuth.auth.signInWithOAuth({ provider: 'google' })
+      if (localRes.error) {
+        set({ error: localRes.error.message, loading: false })
+        return { error: localRes.error }
+      }
+      set({
+        user: localRes.data.user,
+        session: localRes.data.session,
+        loading: false,
+      })
+      return { data: localRes.data }
+    }
+  },
+
   signOut: async () => {
     set({ loading: true })
     try {

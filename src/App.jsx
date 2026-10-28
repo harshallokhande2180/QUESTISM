@@ -11,6 +11,8 @@ import StudyPage from './pages/Study/StudyPage'
 import TimetablePage from './pages/Timetable/TimetablePage'
 import StatusPage from './pages/Status/StatusPage'
 import NotFoundPage from './pages/NotFound'
+import PrivacyPage from './pages/Legal/PrivacyPage'
+import TermsPage from './pages/Legal/TermsPage'
 import AppBackgroundLayout from './components/layout/AppBackgroundLayout'
 
 const queryClient = new QueryClient({
@@ -67,6 +69,10 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AppBackgroundLayout>
         <Routes>
+          {/* Public Pages */}
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+
           {user ? (
             <Route element={<AppShell />}>
               <Route index element={<Navigate to="/routine" replace />} />
@@ -79,12 +85,11 @@ export default function App() {
               <Route path="/auth" element={<Navigate to="/routine" replace />} />
             </Route>
           ) : (
-            <>
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="*" element={<Navigate to="/auth" replace />} />
-            </>
+            <Route path="/auth" element={<AuthPage />} />
           )}
-          <Route path="*" element={<NotFoundPage />} />
+
+          {/* Fallback */}
+          <Route path="*" element={user ? <NotFoundPage /> : <Navigate to="/auth" replace />} />
         </Routes>
       </AppBackgroundLayout>
     </QueryClientProvider>
