@@ -1,7 +1,9 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../../stores/authStore'
+import { useCourseStore } from '../../stores/courseStore'
 import { getLogicalDate, formatLogicalDate } from '../../lib/dayEngine'
 import { TextEffect } from '../core/TextEffect'
+import SettingsModal from './SettingsModal'
 import { useState, useEffect } from 'react'
 import './AppShell.css'
 
@@ -10,22 +12,33 @@ const navItems = [
   { path: '/body', label: 'Body', icon: '💪', systemLabel: 'BODY STATUS' },
   { path: '/care', label: 'Care', icon: '✨', systemLabel: 'CARE LOG' },
   { path: '/study', label: 'Study', icon: '📚', systemLabel: 'STUDY' },
+  { path: '/timetable', label: 'Timetable', icon: '🗓️', systemLabel: 'TIMETABLE' },
   { path: '/status', label: 'Status', icon: '📊', systemLabel: 'STATUS HUD' },
 ]
 
 export default function AppShell() {
-  const { user, signOut } = useAuthStore()
+  const { signOut } = useAuthStore()
+  const { settings, flushOfflineQueue } = useCourseStore()
   const location = useLocation()
-  const [logicalDate, setLogicalDate] = useState(getLogicalDate())
+  const [logicalDate, setLogicalDate] = useState(() =>
+    getLogicalDate(settings?.dayEndTime || '04:00')
+  )
   const [showSettings, setShowSettings] = useState(false)
 
-  // Update logical date every minute
   useEffect(() => {
+    setLogicalDate(getLogicalDate(settings?.dayEndTime || '04:00'))
     const interval = setInterval(() => {
-      setLogicalDate(getLogicalDate())
+      setLogicalDate(getLogicalDate(settings?.dayEndTime || '04:00'))
     }, 60000)
     return () => clearInterval(interval)
-  }, [])
+  }, [settings?.dayEndTime])
+
+  // Offline queue sync when connection returns (Section 6)
+  useEffect(() => {
+    const handleOnline = () => flushOfflineQueue()
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [flushOfflineQueue])
 
   const currentNav = navItems.find(item => location.pathname.startsWith(item.path))
 
@@ -68,7 +81,7 @@ export default function AppShell() {
         <div className="nav-rail__footer">
           <button
             className="nav-rail__settings-btn"
-            onClick={() => setShowSettings(!showSettings)}
+            onClick={() => setShowSettings(true)}
             id="btn-settings"
           >
             ⚙️ Settings
@@ -95,8 +108,17 @@ export default function AppShell() {
               </TextEffect>
             </span>
           </div>
-          <div className="top-bar__right">
+          <div className="top-bar__right" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span className="top-bar__date">{formatLogicalDate(logicalDate)}</span>
+            <button
+              type="button"
+              className="btn btn-outline"
+              style={{ padding: '4px 8px', fontSize: '0.75rem' }}
+              onClick={() => setShowSettings(true)}
+              aria-label="Open Settings"
+            >
+              ⚙️
+            </button>
           </div>
         </header>
 
@@ -122,6 +144,9 @@ export default function AppShell() {
           </NavLink>
         ))}
       </nav>
+
+      {/* ── Settings, Privacy & Verification Modal ── */}
+      <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </div>
   )
 }

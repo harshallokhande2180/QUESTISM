@@ -94,7 +94,7 @@ const presetVariants = {
 export function TextEffect({
   children,
   per = 'word',
-  as: Component = 'p',
+  as: Component = 'span',
   variants,
   className,
   preset = 'fade',
@@ -153,18 +153,19 @@ export function TextEffect({
   }, [selectedVariants, segmentTransition])
 
   // Split text into segments
+  const textContent = typeof children === 'string' ? children : String(children ?? '')
   const segments = useMemo(() => {
     if (per === 'line') {
-      return children.split('\n')
+      return textContent.split('\n')
     } else if (per === 'word') {
-      return children.split(/(\s+)/)
+      return textContent.split(/(\s+)/)
     } else {
       // per char
-      return children.split('')
+      return textContent.split('')
     }
-  }, [children, per])
+  }, [textContent, per])
 
-  const MotionComponent = motion.create(Component)
+  const MotionComponent = useMemo(() => motion.create(Component), [Component])
 
   return (
     <AnimatePresence mode="popLayout">

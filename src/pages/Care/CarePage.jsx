@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getLogicalDate, formatLogicalDateISO } from '../../lib/dayEngine'
+import { useCourseStore } from '../../stores/courseStore'
 import './Care.css'
 
 const SKIN_STEPS_AM = [
@@ -17,17 +18,18 @@ const SKIN_STEPS_PM = [
 ]
 
 const NECK_STRETCHES = [
-  { id: 'neck-forward', label: 'Chin to Chest', duration: 15 },
-  { id: 'neck-left', label: 'Left Lateral Tilt', duration: 15 },
-  { id: 'neck-right', label: 'Right Lateral Tilt', duration: 15 },
-  { id: 'neck-rotation-l', label: 'Left Rotation', duration: 15 },
-  { id: 'neck-rotation-r', label: 'Right Rotation', duration: 15 },
-  { id: 'neck-extension', label: 'Extension (Look Up)', duration: 10 },
-  { id: 'shoulder-rolls', label: 'Shoulder Rolls', duration: 20 },
-  { id: 'chest-stretch', label: 'Chest Door Stretch', duration: 20 },
+  { id: 'neck-forward', label: 'Chin to Chest (Neck Up-and-Down 1/2)', duration: 15 },
+  { id: 'neck-extension', label: 'Extension — Look Up (Neck Up-and-Down 2/2)', duration: 10 },
+  { id: 'neck-rotation-l', label: 'Left Rotation (Neck Rotation 1/2)', duration: 15 },
+  { id: 'neck-rotation-r', label: 'Right Rotation (Neck Rotation 2/2)', duration: 15 },
+  { id: 'neck-left', label: 'Left Lateral Tilt (Stretch 1)', duration: 15 },
+  { id: 'neck-right', label: 'Right Lateral Tilt (Stretch 1)', duration: 15 },
+  { id: 'shoulder-rolls', label: 'Shoulder Rolls (Stretch 2)', duration: 20 },
+  { id: 'chest-stretch', label: 'Chest Door Stretch (Stretch 3)', duration: 20 },
 ]
 
 const STORAGE_KEY = 'questism_care_data'
+const ROUTINE_KEY = 'questism_routine_data'
 
 function loadCareData() {
   try {
@@ -41,23 +43,48 @@ function saveCareData(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
 }
 
+function syncRoutineCare(dateStr, skinAmDone, skinPmDone, neckDone) {
+  try {
+    const raw = localStorage.getItem(ROUTINE_KEY)
+    const routineData = raw ? JSON.parse(raw) : { completed: {}, custom: {}, tomorrow: {} }
+    if (!routineData.completed) routineData.completed = {}
+    if (!routineData.completed[dateStr]) routineData.completed[dateStr] = {}
+    routineData.completed[dateStr]['care-skin-am'] = skinAmDone
+    routineData.completed[dateStr]['care-skin-pm'] = skinPmDone
+    routineData.completed[dateStr]['care-neck'] = neckDone
+    localStorage.setItem(ROUTINE_KEY, JSON.stringify(routineData))
+  } catch {}
+}
+
 export default function CarePage() {
-  const dateStr = formatLogicalDateISO(getLogicalDate())
+  const { settings, triggerSyncFeedback } = useCourseStore()
+  const logicalDate = getLogicalDate(settings?.dayEndTime || '04:00')
+  const dateStr = formatLogicalDateISO(logicalDate)
+  const dayOfWeek = logicalDate.getDay()
+  const defaultHairScheduled = [0, 1, 3, 5].includes(dayOfWeek)
 
   const [completed, setCompleted] = useState(() => {
     const data = loadCareData()
-    return data?.[dateStr] || {}
+    return data?.[dateStr] || { hairScheduled: defaultHairScheduled }
   })
 
   const [activeTimer, setActiveTimer] = useState(null)
   const [timerSeconds, setTimerSeconds] = useState(0)
 
-  // Persist
+  const skinAmDone = SKIN_STEPS_AM.every(s => completed[s.id])
+  const skinPmDone = SKIN_STEPS_PM.every(s => completed[s.id])
+  const neckDone = NECK_STRETCHES.every(s => completed[s.id])
+  const hairScheduled =
+    completed.hairScheduled !== undefined ? Boolean(completed.hairScheduled) : defaultHairScheduled
+  const hairDone = Boolean(completed['hair-care-step'])
+
+  // Persist & sync to Routine
   useEffect(() => {
     const data = loadCareData() || {}
     data[dateStr] = completed
     saveCareData(data)
-  }, [completed, dateStr])
+    syncRoutineCare(dateStr, skinAmDone, skinPmDone, neckDone)
+  }, [completed, dateStr, skinAmDone, skinPmDone, neckDone])
 
   // Timer
   useEffect(() => {
@@ -69,6 +96,7 @@ export default function CarePage() {
       setCompleted(prev => ({ ...prev, [activeTimer]: true }))
       setActiveTimer(null)
       setTimerSeconds(0)
+      triggerSyncFeedback()
       return
     }
 
@@ -76,7 +104,7 @@ export default function CarePage() {
       setTimerSeconds(prev => prev + 1)
     }, 1000)
     return () => clearInterval(interval)
-  }, [activeTimer, timerSeconds])
+  }, [activeTimer, timerSeconds, triggerSyncFeedback])
 
   const startTimer = (stretchId) => {
     if (activeTimer === stretchId) {
@@ -90,11 +118,8 @@ export default function CarePage() {
 
   const toggle = (id) => {
     setCompleted(prev => ({ ...prev, [id]: !prev[id] }))
+    triggerSyncFeedback()
   }
-
-  const skinAmDone = SKIN_STEPS_AM.every(s => completed[s.id])
-  const skinPmDone = SKIN_STEPS_PM.every(s => completed[s.id])
-  const neckDone = NECK_STRETCHES.every(s => completed[s.id])
 
   return (
     <div className="care-page">
@@ -104,7 +129,7 @@ export default function CarePage() {
           <span className="text-cyan">⟐</span> Care Log
         </h1>
         <p className="care-header__subtitle">
-          Track your skin care routine and neck stretches. Consistency is power.
+          Track your morning/night skin care, scheduled hair care, and neck/mobility stretches.
         </p>
       </div>
 
@@ -119,9 +144,9 @@ export default function CarePage() {
         <div className="care-section__header">
           <div className="care-section__header-left">
             <span>☀️</span>
-            <span className="hud-label">Morning Routine</span>
+            <span className="hud-label">Morning Skin Routine</span>
           </div>
-          {skinAmDone && <span className="badge badge--green">CLEAR</span>}
+          {skinAmDone && <span className="text-green">CLEAR</span>}
         </div>
         <div className="care-section__items">
           {SKIN_STEPS_AM.map(step => (
@@ -146,9 +171,9 @@ export default function CarePage() {
         <div className="care-section__header">
           <div className="care-section__header-left">
             <span>🌙</span>
-            <span className="hud-label">Night Routine</span>
+            <span className="hud-label">Night Skin Routine</span>
           </div>
-          {skinPmDone && <span className="badge badge--green">CLEAR</span>}
+          {skinPmDone && <span className="text-green">CLEAR</span>}
         </div>
         <div className="care-section__items">
           {SKIN_STEPS_PM.map(step => (
@@ -168,14 +193,70 @@ export default function CarePage() {
         </div>
       </div>
 
-      {/* ── Neck & Stretch ── */}
+      {/* ── Scheduled Hair Care (Section 2.2) ── */}
+      <div className={`care-section glass-panel ${hairScheduled && hairDone ? 'care-section--complete' : ''}`}>
+        <div className="care-section__header">
+          <div className="care-section__header-left">
+            <span>💇</span>
+            <span className="hud-label">Hair Care Schedule</span>
+          </div>
+          <button
+            type="button"
+            className="btn btn-outline"
+            style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+            onClick={() =>
+              setCompleted(prev => ({ ...prev, hairScheduled: !hairScheduled }))
+            }
+          >
+            {hairScheduled ? 'Scheduled Today' : 'Not Due Today'}
+          </button>
+        </div>
+        {hairScheduled ? (
+          <div className="care-section__items">
+            <button
+              className={`care-item ${hairDone ? 'care-item--done' : ''}`}
+              onClick={() => toggle('hair-care-step')}
+              id="care-hair-step"
+            >
+              <span className="care-item__icon">✨</span>
+              <span className="care-item__label">Scalp Care / Conditioning Wash</span>
+              <span className={`care-item__check ${hairDone ? 'care-item__check--done' : ''}`}>
+                {hairDone ? '✓' : ''}
+              </span>
+            </button>
+          </div>
+        ) : (
+          <p style={{ fontSize: '0.8125rem', color: '#94A3B8', padding: '4px 0' }}>
+            No hair steps scheduled for today — excluded from today's CARE % calculation.
+          </p>
+        )}
+      </div>
+
+      {/* ── Neck & Stretch (Feeds BODY % in Status) ── */}
       <div className={`care-section glass-panel ${neckDone ? 'care-section--complete' : ''}`}>
         <div className="care-section__header">
           <div className="care-section__header-left">
             <span>🧘</span>
-            <span className="hud-label">Neck & Stretch</span>
+            <span className="hud-label">Neck & Stretch Mobility</span>
           </div>
-          {neckDone && <span className="badge badge--green">CLEAR</span>}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button
+              type="button"
+              className="btn btn-outline"
+              style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+              onClick={() => {
+                const next = { ...completed }
+                NECK_STRETCHES.forEach(s => {
+                  next[s.id] = !neckDone
+                })
+                setCompleted(next)
+                triggerSyncFeedback()
+              }}
+              id="btn-complete-all-stretches"
+            >
+              {neckDone ? 'Reset All' : '✓ Mark All Done'}
+            </button>
+          </div>
         </div>
         <div className="care-section__items">
           {NECK_STRETCHES.map(stretch => {
@@ -185,23 +266,33 @@ export default function CarePage() {
 
             return (
               <div key={stretch.id} className={`care-stretch ${isDone ? 'care-stretch--done' : ''}`}>
-                <button
-                  className={`care-stretch__btn ${isActive ? 'care-stretch__btn--active' : ''}`}
-                  onClick={() => startTimer(stretch.id)}
-                  id={`stretch-${stretch.id}`}
-                >
-                  <span className="care-stretch__label">{stretch.label}</span>
-                  <div className="care-stretch__timer-info">
-                    {isActive ? (
-                      <span className="care-stretch__countdown text-cyan">
-                        {stretch.duration - timerSeconds}s
-                      </span>
-                    ) : (
-                      <span className="care-stretch__duration">{stretch.duration}s</span>
-                    )}
-                    {isDone && <span className="text-green" style={{ marginLeft: 6 }}>✓</span>}
-                  </div>
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <button
+                    type="button"
+                    className={`care-item__check ${isDone ? 'care-item__check--done' : ''}`}
+                    onClick={() => toggle(stretch.id)}
+                    title="Toggle completion"
+                  >
+                    {isDone ? '✓' : ''}
+                  </button>
+                  <button
+                    className={`care-stretch__btn ${isActive ? 'care-stretch__btn--active' : ''}`}
+                    style={{ flex: 1 }}
+                    onClick={() => startTimer(stretch.id)}
+                    id={`stretch-${stretch.id}`}
+                  >
+                    <span className="care-stretch__label">{stretch.label}</span>
+                    <div className="care-stretch__timer-info">
+                      {isActive ? (
+                        <span className="care-stretch__countdown text-cyan">
+                          {stretch.duration - timerSeconds}s
+                        </span>
+                      ) : (
+                        <span className="care-stretch__duration">{stretch.duration}s timer</span>
+                      )}
+                    </div>
+                  </button>
+                </div>
                 {(isActive || isDone) && (
                   <div className="progress-bar" style={{ marginTop: 4 }}>
                     <div

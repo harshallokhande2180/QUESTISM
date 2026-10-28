@@ -1,28 +1,34 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-/**
- * Timetable Store
- * ----------------
- * Manages 30‑day lock state for each calendar date.
- *
- * - `locks` is an object where keys are ISO date strings (YYYY‑MM‑DD)
- *   and values are boolean (`true` = locked).
- * - `toggleLock(date)` flips the lock for the given date, respecting the
- *   30‑day rule: a lock can only be toggled if the date is within the next
- *   30 days from the logical today.
- * - `breakLock(date)` removes a lock with a penalty flag, used by the UI.
- */
+const DEFAULT_WEEKDAY_BLOCKS = [
+  { id: 'wd-1', startTime: '07:00', endTime: '08:00', label: 'Morning Workout & Stretch', type: 'workout' },
+  { id: 'wd-2', startTime: '18:00', endTime: '20:00', label: 'Evening Study Session A', type: 'study' },
+  { id: 'wd-3', startTime: '21:00', endTime: '23:00', label: 'Night Study Session B', type: 'study' },
+]
+
+const DEFAULT_WEEKEND_BLOCKS = [
+  { id: 'we-1', startTime: '08:00', endTime: '09:00', label: 'Morning Run & Mobility', type: 'workout' },
+  { id: 'we-2', startTime: '10:00', endTime: '12:00', label: 'Deep Focus Study Block 1', type: 'study' },
+  { id: 'we-3', startTime: '15:00', endTime: '17:00', label: 'Deep Focus Study Block 2', type: 'study' },
+]
+
+export function getBlockHours(block) {
+  if (!block?.startTime || !block?.endTime) return 0
+  const [sh, sm] = block.startTime.split(':').map(Number)
+  const [eh, em] = block.endTime.split(':').map(Number)
+  const diffMinutes = (eh * 60 + em) - (sh * 60 + sm)
+  return Math.max(0, Number((diffMinutes / 60).toFixed(2)))
+}
+
 export const useTimetableStore = create(
   persist(
     (set, get) => ({
       locks: {},
-      // Set or toggle lock for a date (if within 30‑day window)
+      weekdayBlocks: DEFAULT_WEEKDAY_BLOCKS,
+      weekendBlocks: DEFAULT_WEEKEND_BLOCKS,
+
       toggleLock: (date) => {
-        const today = new Date()
-        const target = new Date(date)
-        const diff = (target - today) / (1000 * 60 * 60 * 24)
-        if (diff < 0 || diff > 30) return // out of allowed range
         set((state) => ({
           locks: {
             ...state.locks,
@@ -30,16 +36,72 @@ export const useTimetableStore = create(
           },
         }))
       },
-      // Force‑break a lock (penalty can be handled elsewhere)
+
       breakLock: (date) => {
         set((state) => {
           const { [date]: _, ...rest } = state.locks
           return { locks: rest }
         })
       },
+
+      addBlock: (planType, block) => {
+        const key = planType === 'weekend' ? 'weekendBlocks' : 'weekdayBlocks'
+        const newBlock = {
+          ...block,
+          id: `${planType}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        }
+        set(state => ({
+          [key]: [...(state[key] || []), newBlock].sort((a, b) => a.startTime.localeCompare(b.startTime)),
+        }))
+      },
+
+      removeBlock: (planType, blockId) => {
+        const key = planType === 'weekend' ? 'weekendBlocks' : 'weekdayBlocks'
+        set(state => ({
+          [key]: (state[key] || []).filter(b => b.id !== blockId),
+        }))
+      },
+
+      getStudyHoursCheck: (topicLengthMinutes = 60) => {
+        const state = get()
+        const requiredHours = Number(((4 * topicLengthMinutes) / 60).toFixed(1))
+
+        const weekdayStudyHours = Number(
+          (state.weekdayBlocks || [])
+            .filter(b => b.type === 'study')
+            .reduce((sum, b) => sum + getBlockHours(b), 0)
+            .toFixed(1)
+        )
+
+        const weekendStudyHours = Number(
+          (state.weekendBlocks || [])
+            .filter(b => b.type === 'study')
+            .reduce((sum, b) => sum + getBlockHours(b), 0)
+            .toFixed(1)
+        )
+
+        const warnings = []
+        if (weekdayStudyHours < requiredHours) {
+          warnings.push(
+            `Your weekday study blocks total ${weekdayStudyHours} hours. Four topics need about ${requiredHours} hours.`
+          )
+        }
+        if (weekendStudyHours < requiredHours) {
+          warnings.push(
+            `Your weekend study blocks total ${weekendStudyHours} hours. Four topics need about ${requiredHours} hours.`
+          )
+        }
+
+        return {
+          requiredHours,
+          weekdayStudyHours,
+          weekendStudyHours,
+          warnings,
+        }
+      },
     }),
     {
-      name: 'questism_timetable', // storage key
+      name: 'questism_timetable',
     }
   )
 )

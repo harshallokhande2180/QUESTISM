@@ -1,0 +1,12 @@
+{
+  "name": "QUESTISM — System Interface",
+  "description": "Questism — The Beginning of Winter Arc. A gamified personal discipline system inspired by Solo Leveling.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

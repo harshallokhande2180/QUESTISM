@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useAuthStore } from './stores/authStore'
 import AppShell from './components/layout/AppShell'
 import AuthPage from './pages/Auth/AuthPage'
@@ -7,18 +8,20 @@ import RoutinePage from './pages/Routine/RoutinePage'
 import BodyPage from './pages/Body/BodyPage'
 import CarePage from './pages/Care/CarePage'
 import StudyPage from './pages/Study/StudyPage'
+import TimetablePage from './pages/Timetable/TimetablePage'
 import StatusPage from './pages/Status/StatusPage'
 import NotFoundPage from './pages/NotFound'
 import AppBackgroundLayout from './components/layout/AppBackgroundLayout'
 
-/**
- * Main App Component
- * 
- * For Phase 1, we run in "local-first" mode:
- * - No Supabase credentials required
- * - All data persisted to localStorage
- * - Auth is bypassed (demo mode) unless Supabase is configured
- */
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      retry: 1,
+    },
+  },
+})
+
 export default function App() {
   const { user, loading, initialize } = useAuthStore()
 
@@ -26,7 +29,6 @@ export default function App() {
     initialize()
   }, [initialize])
 
-  // Loading state
   if (loading) {
     return (
       <AppBackgroundLayout
@@ -61,28 +63,30 @@ export default function App() {
     )
   }
 
-  // Auth-gated routes
   return (
-    <AppBackgroundLayout>
-      <Routes>
-        {user ? (
-          <Route element={<AppShell />}>
-            <Route index element={<Navigate to="/routine" replace />} />
-            <Route path="/routine" element={<RoutinePage />} />
-            <Route path="/body" element={<BodyPage />} />
-            <Route path="/care" element={<CarePage />} />
-            <Route path="/study" element={<StudyPage />} />
-            <Route path="/status" element={<StatusPage />} />
-            <Route path="/auth" element={<Navigate to="/routine" replace />} />
-          </Route>
-        ) : (
-          <>
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="*" element={<Navigate to="/auth" replace />} />
-          </>
-        )}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </AppBackgroundLayout>
+    <QueryClientProvider client={queryClient}>
+      <AppBackgroundLayout>
+        <Routes>
+          {user ? (
+            <Route element={<AppShell />}>
+              <Route index element={<Navigate to="/routine" replace />} />
+              <Route path="/routine" element={<RoutinePage />} />
+              <Route path="/body" element={<BodyPage />} />
+              <Route path="/care" element={<CarePage />} />
+              <Route path="/study" element={<StudyPage />} />
+              <Route path="/timetable" element={<TimetablePage />} />
+              <Route path="/status" element={<StatusPage />} />
+              <Route path="/auth" element={<Navigate to="/routine" replace />} />
+            </Route>
+          ) : (
+            <>
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="*" element={<Navigate to="/auth" replace />} />
+            </>
+          )}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </AppBackgroundLayout>
+    </QueryClientProvider>
   )
 }

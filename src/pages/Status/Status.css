@@ -1,5 +1,5 @@
 /* ========================================
-   STATUS PAGE — Hunter HUD
+   STATUS HUD STYLES (SECTION 2.2)
    ======================================== */
 
 .status-page {
@@ -8,43 +8,52 @@
   gap: 20px;
 }
 
+.status-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.status-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .status-header__title {
-  font-size: 1.375rem;
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 8px;
+  font-size: 1.5rem;
+}
+
+.status-date-text {
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  color: var(--monarch-light);
 }
 
 .status-header__subtitle {
-  font-size: 0.8125rem;
-  color: #64748B;
+  font-size: 0.875rem;
+  color: #94A3B8;
 }
 
-/* ── Profile Card ── */
+/* ── Arc Level Profile Card ── */
 .status-profile {
+  position: relative;
+  overflow: hidden;
   padding: 24px;
   display: flex;
   align-items: center;
   gap: 20px;
-  position: relative;
-  overflow: hidden;
 }
 
-.status-profile::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -30%;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.04), transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.status-profile__avatar {
-  flex-shrink: 0;
+@media (max-width: 640px) {
+  .status-profile {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .status-profile__avatar-ring {
@@ -55,134 +64,196 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0.02));
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
-  animation: pulse-glow 4s ease-in-out infinite;
+  background: rgba(168, 85, 247, 0.12);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
 }
 
 .status-profile__avatar-icon {
   font-size: 1.5rem;
-  color: var(--monarch-purple);
+  color: var(--monarch-light);
 }
 
 .status-profile__info {
   flex: 1;
-  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .status-profile__name {
-  font-size: 1rem;
-  margin-bottom: 8px;
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
 }
 
-.status-profile__badges {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+.status-arc-desc {
+  font-size: 0.8125rem;
+  color: #94A3B8;
+  line-height: 1.45;
 }
 
 .status-profile__power {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 110px;
 }
 
 .status-profile__power-label {
   font-family: var(--font-hud);
-  font-size: 0.5625rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  color: #64748B;
-  margin-bottom: 4px;
+  font-size: 0.6875rem;
+  color: #94A3B8;
 }
 
 .status-profile__power-value {
   font-family: var(--font-hud);
   font-size: 2rem;
   font-weight: 900;
-  color: var(--monarch-purple);
-  text-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
-  line-height: 1;
+  color: var(--dungeon-gold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
 }
 
-/* ── Stat Bars ── */
-.status-stats {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
+.status-next-arc-hint {
+  font-size: 0.75rem;
+  color: #C084FC;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 3 Core Areas Grid (BODY, CARE, STUDY) ── */
+.status-areas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
-.status-stats__bars {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+@media (max-width: 900px) {
+  .status-areas-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-/* ── Hex Chart ── */
-.status-hex {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: center;
-}
-
-.status-hex__chart {
-  width: 100%;
-  max-width: 300px;
-}
-
-.status-hex__svg {
-  width: 100%;
-  height: auto;
-}
-
-/* ── Today's Summary ── */
-.status-summary {
+.status-area-card {
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.status-summary__date {
+.status-area-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.status-area-card__scores {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-score-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.status-score-col__label {
+  font-size: 0.6875rem;
+  color: #94A3B8;
+  text-transform: uppercase;
+}
+
+.status-score-col__value {
   font-family: var(--font-hud);
-  font-size: 1rem;
-  font-weight: 600;
-  color: #F8FAFC;
-  letter-spacing: 0.05em;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #F3E8FF;
+  font-variant-numeric: tabular-nums;
 }
 
-.status-summary__grid {
+.status-score-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(168, 85, 247, 0.25);
+}
+
+.status-area-card__detail {
+  font-size: 0.78rem;
+  color: #94A3B8;
+  line-height: 1.45;
+}
+
+/* ── Lifetime Totals Grid ── */
+.status-lifetime {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.status-lifetime__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.status-lifetime__note {
+  font-size: 0.75rem;
+  color: #94A3B8;
+}
+
+.status-lifetime__grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
 }
 
-.status-summary__item {
-  padding: 14px;
-  background: var(--surface-mid);
-  border-radius: 8px;
+@media (max-width: 768px) {
+  .status-lifetime__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .status-lifetime__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.status-lifetime__item {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(14, 5, 32, 0.6);
+  border: 1px solid rgba(139, 92, 246, 0.16);
   display: flex;
   flex-direction: column;
   gap: 6px;
-  text-align: center;
 }
 
-.status-summary__item-label {
-  font-family: var(--font-hud);
-  font-size: 0.5625rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #64748B;
+.status-lifetime__label {
+  font-size: 0.75rem;
+  color: #94A3B8;
 }
 
-.status-summary__item-value {
+.status-lifetime__val-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.status-lifetime__value {
   font-family: var(--font-hud);
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 800;
-  line-height: 1;
+  color: #F3E8FF;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-lifetime__unit {
+  font-size: 0.75rem;
+  color: var(--monarch-light);
 }
